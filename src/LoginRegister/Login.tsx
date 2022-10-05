@@ -6,14 +6,33 @@ import {
   TextField,
   Button,
   CardMedia,
+  Alert
 } from "@mui/material";
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import HandleLogReg from "../endpoints/HandleLogReg";
 const Login = () => {
   let navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [status,setStatus]=useState<string>("none");
+  const handleSubmit=async (data:object)=>{
+          try {
+            let response=await HandleLogReg().LogIn(data);
+            if(response.status==400){
+                let res=await response.json();
+                console.log(res);
+                setStatus('');}
+            else {
+                let token=await response.json();
+                console.log(token)
+            }
+          } catch (error) {
+            console.log(error);
+          }
+
+  }
   return (
     <Container
       sx={{
@@ -22,6 +41,8 @@ const Login = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection:'column',
+        
       }}
     >
       <Card
@@ -41,6 +62,7 @@ const Login = () => {
           sx={{ height: "100vh", width: "100%", objectFit: "cover" }}
         ></CardMedia>
       </Card>
+      
       <Card
         sx={{
           maxWidht: "70%",
@@ -51,7 +73,7 @@ const Login = () => {
           flexDirection: "column",
           borderRadius: "20px",
           boxShadow: "10",
-          height: "30rem",
+          height: "31.5rem",
           gap: "20px",
         }}
       >
@@ -65,18 +87,24 @@ const Login = () => {
             justifyContent: "center",
             alignItems: "center",
           }}
+          onSubmit={((e)=>{
+            e.preventDefault();
+            const data={email:email,password:password};
+            handleSubmit(data);
+          })}
         >
-          <TextField label="Email" size="medium"></TextField>
-          <TextField label="Password" size="medium" type="password"></TextField>
+          <TextField label="Email" size="medium" required onChange={(e)=>{
+            setEmail(e.target.value);
+          }}></TextField>
+          <TextField label="Password" size="medium" type="password" required onChange={(e)=>{
+            setPassword(e.target.value);
+          }}></TextField>
           <Button
             variant="contained"
             color="primary"
             type="submit"
             size="small"
             sx={{ width: "7rem" }}
-            onClick={()=>{
-                navigate('/Home')
-            }}
           >
             Submit
           </Button>
@@ -84,16 +112,14 @@ const Login = () => {
         <Button
           variant="contained"
           color="success"
-          size="medium"
+          size="small"
           sx={{ width: "7rem" }}
           onClick={() => {
-            navigate("/register");
-          }}
-        >
-          {" "}
-          Register
+            navigate('/register')}}>Register
         </Button>
+         <Alert severity="error" sx={{display:status}}>Invalid Email or Password</Alert>
       </Card>
+      
     </Container>
   );
 };

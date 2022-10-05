@@ -9,11 +9,12 @@ import {
   Select,
   MenuItem,
   FormControl,
-  CardMedia
+  CardMedia,
+  FormHelperText
 } from "@mui/material";
 import { useState } from "react";
-
-const Register = () => {
+import HandleLogReg from "../endpoints/HandleLogReg";
+const RegisterComp = () => {
   const cities = [
     "Timisoara",
     "Bucuresti",
@@ -25,12 +26,14 @@ const Register = () => {
     "Oradea",
     "Arad",
   ];
-  const [city, setCity] = useState<string>(" ");
+  const [city, setCity] = useState<string|null>(null);
   const [email, setEmail] = useState<string>(" ");
   const [password, setPasword] = useState<string>("");
   const [username, setUsername] = useState<string>(" ");
-  const [usertype,setUserType]=useState<string>(" ");
+  const [usertype,setUserType]=useState<string|null>(null);
+  const [phoneNumber,setPhone]=useState<string>(" ");
   let cityname:string=' ';
+
   return (
     <Container
       sx={{
@@ -84,6 +87,13 @@ const Register = () => {
             justifyContent: "center",
             alignItems: "center",
           }}
+          onSubmit={(async(e)=>{
+             e.preventDefault();
+             let data={username:username,password:password,email:email,location:city,phonenumber:phoneNumber,type:usertype};
+             let resposne=await HandleLogReg().Register(data);
+             let message=await resposne.json();
+             console.log(message);
+            })}
         >
           <Box
             sx={{
@@ -140,8 +150,18 @@ const Register = () => {
                   <MenuItem key={city} value={String(city)}>{city}</MenuItem>
                 ))}
               </Select>
+             
             </FormControl>
           </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
            <FormControl sx={{ m: 1, minWidth: 80 }}>
               <InputLabel id="demo-simple-select-autowidth-label">
                 UserType
@@ -160,14 +180,26 @@ const Register = () => {
                 <MenuItem value='user'>user</MenuItem>
                 <MenuItem value='barman'>barman</MenuItem>
               </Select>
+             
+
             </FormControl>
+            <TextField
+              inputProps={{maxLenght:10}}
+              label="Phonenumber"
+              size="medium"
+              onChange={(e)=>{
+              setPhone(e.target.value);
+              }}
+              required
+            ></TextField>
+            </Box>
           <Button
             variant="contained"
             color="primary"
             type="submit"
             size="small"
             sx={{ width: "7rem" }}
-            onClick={() => {}}
+            
           >
             Submit
           </Button>
@@ -177,4 +209,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default RegisterComp;

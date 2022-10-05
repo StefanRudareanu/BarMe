@@ -4,13 +4,17 @@ import {
   Typography,
   Rating,
   Divider,
+  Button
   
 } from "@mui/material";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import EmailIcon from "@mui/icons-material/Email";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import ProfileList from "../Components/ProfileList";
+import { useState } from "react";
+
 const Profile = () => {
+  const [image,setImage]=useState<string>(' ');
   const eventsname=[
     {name:'Maria&DAn',
       _id:'123459'},
@@ -62,7 +66,7 @@ const Profile = () => {
           display: "flex",
           flexDirection: "row",
           width: "70%",
-          height: "10rem",
+          height: "14rem",
           justifyContent: "center",
           alignItems: "center",
           backgroundColor: "rgb(190,38,35)",
@@ -76,9 +80,17 @@ const Profile = () => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
+            gap:'10px'
           }}
         >
-          <Avatar alt="Remy Sharp" sx={{ width: 100, height: 100 }} />
+          <Avatar alt="Remy Sharp" sx={{ width: 100, height: 100 }} src={image} />
+           <Button variant="contained" sx={{height:'1 rem'}} component="label">
+        Upload
+        <input hidden accept="image/*" multiple type="file" onChange={(e)=>{
+         let data=URL.createObjectURL(e.target?.files?.[0] as Blob);
+         setImage(data);
+        }} />
+      </Button>
           <Typography sx={{ fontSize: "1.2rem", color: "white" }}>
             Stefan Rudareanu
           </Typography>
