@@ -6,28 +6,48 @@ import {
   TextField,
   Button,
   CardMedia,
-  Alert
+  Alert,
+  FormGroup,
+  Checkbox,
+  FormControlLabel
 } from "@mui/material";
-
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HandleLogReg from "../endpoints/HandleLogReg";
+import useLocal from "../customhooks/useLocal";
+interface dataprovided{
+    token:string,
+    username:string,
+    type:string
+}
 const Login = () => {
   let navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [status,setStatus]=useState<string>("none");
+  const [checkstatus,setCheckstatus]=useState<string>(' ');
+  const local=useLocal();
   const handleSubmit=async (data:object)=>{
           try {
             let response=await HandleLogReg().LogIn(data);
             if(response.status==400){
                 let res=await response.json();
-                console.log(res);
-                setStatus('');}
+                setStatus(' ');
+                console.log(res);}
             else {
-                let token=await response.json();
-                console.log(token)
+                let res=await response.json() as dataprovided;
+                if(checkstatus=='on'){
+                local.CreateStorage(res.token,'auth-token');
+                local.CreateStorage(res.username,'username');
+                local.CreateStorage(res.type,'usertype');
+                }
+                else {
+                local.CreateSessionStorage(res.token,'auth-token');
+                local.CreateSessionStorage(res.username,'username');
+                local.CreateSessionStorage(res.type,'usertype'); }
+                navigate('/Home');
             }
+
           } catch (error) {
             console.log(error);
           }
@@ -73,7 +93,7 @@ const Login = () => {
           flexDirection: "column",
           borderRadius: "20px",
           boxShadow: "10",
-          height: "31.5rem",
+          height: "33rem",
           gap: "20px",
         }}
       >
@@ -117,10 +137,16 @@ const Login = () => {
           onClick={() => {
             navigate('/register')}}>Register
         </Button>
+        <FormGroup>
+         <FormControlLabel label="Keep me signed in" sx={{fontSize:'0.4rem'}} control={<Checkbox  onChange={(e)=>{
+           setCheckstatus(e.target.value);
+         }}/>} />
+        </FormGroup>
          <Alert severity="error" sx={{display:status}}>Invalid Email or Password</Alert>
       </Card>
       
     </Container>
   );
 };
+
 export default Login;
