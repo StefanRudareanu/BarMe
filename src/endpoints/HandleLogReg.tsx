@@ -14,7 +14,10 @@ const HandleLogReg=(()=>{
          headers:{
              'Content-Type': 'application/json'},
          body:JSON.stringify(data)
-      })}
+      })},
+      async GetUserData(username:string,token:string){
+         return await fetch(`httpp://localhost:4000/api/users/me/`)
+      }
    }
    })
 export default HandleLogReg;

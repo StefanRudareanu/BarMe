@@ -11,14 +11,38 @@
             })
         },
         async AddDrinks(username:string,token:string,drinkname:string){
+            const obj={drinkname:drinkname}
             return await fetch(`http://localhost:4000/api/users/${username}`,{
-                method:'POST',
+                method:'PATCH',
                 headers:{
                     "Content-type":"application/json",
                     'auth-token':token},
-                body:JSON.stringify({drinkname:drinkname})
+                body:JSON.stringify(obj)
+            })
+        },
+        async AddRating(username:string,rating:number,token:string){
+            return await fetch(' ',{
+                method:'PATCH',
+                headers:{
+                    "Content-type":"application/json",
+                    'auth-token':token}});},
+        async GetBarmanDataBarman(barmanusername:string,location:string,token:string){
+            return await fetch(`http://localhost:4000/api/users/allbarmans/${barmanusername}/${location}`,{
+                method:"GET",
+                headers:{
+                    "Content-type":"application/json",
+                    "auth-token":token}
+            })
+        },
+        async GetBarmanDataUser(location:string,token:string){
+            return await fetch(`http://localhost:4000/api/users/allbarmansusers/${location}/`,{
+                method:"GET",
+                headers:{
+                    "Content-type":"application/json",
+                    "auth-token":token}
             })
         }
+                
     }
 }
 export default UserData;

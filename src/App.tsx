@@ -5,6 +5,8 @@ import RegisterComp from './LoginRegister/RegisterComp';
 import Navbar from './Components/Navbar';
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import Profile from './Page/MyProfile';
+import {useState} from "react"
+import Home from './Page/Home';
 import './App.css'
 const App=()=> {
   return (
@@ -13,8 +15,8 @@ const App=()=> {
       <Routes>
         <Route path='/'element={<Login/>}/>
         <Route path='/register'element={<RegisterComp/>}/>
-        <Route path='/Home'element={<Navbar/>}/>
-        <Route path='/MyProfile'element={<><Navbar/><Profile/></>}/>
+        <Route path='/Home'element={<><Home/><Navbar/></>}/>
+        <Route  path='/Profile/:usernameRoute'element={<><Navbar/><Profile/></>}/>
       </Routes>
        </div>
     </BrowserRouter>

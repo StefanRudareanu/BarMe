@@ -12,7 +12,7 @@ import {
   Collapse,
   TextField,
 } from "@mui/material";
-
+import CocktailList from "../Components/CocktailsList";
 import useLocal from "../customhooks/useLocal";
 import UserData from "../endpoints/HandleUserData";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
@@ -20,12 +20,12 @@ import EmailIcon from "@mui/icons-material/Email";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import ProfileList from "../Components/ProfileList";
 import PhotoManager from "../endpoints/PhotoManager";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import StarBorder from "@mui/icons-material/StarBorder";
 import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import {FunctionComponent as FC} from "react";
 interface userdata {
   data: {
     email: string;
@@ -34,14 +34,19 @@ interface userdata {
     profileImage: string;
     rating: number;
     username: string;
+    specilaDrinks:string[];
   };
-}
+};
 const Profile = () => {
+  const {usernameRoute}=useParams();
   const [userdata, SetUserdata] = useState<userdata>();
   let [change, setChange] = useState(0);
   const [ratingstate, setRatingState] = useState("No rating given:");
   const [drink, setDrink] = useState("");
   const local = useLocal();
+  const [viewType,setViewType]=useState(" ");
+  const [boxHeight,setHeight]=useState("23rem");
+  const [boxMargin,setMargin]=useState('0px');
   let eventsnames = [
     { name: "Stefan", _id: "some" },
     { name: "Stefan", _id: "some" },
@@ -59,26 +64,46 @@ const Profile = () => {
   };
   let username: string;
   let token: string;
+  let type:string;
   const handlegetdata = async (username: string, token: string) => {
     try {
       const res = await UserData().GetUserData(username, token);
       const data = await res.json();
       SetUserdata(data);
-      console.log(data.data.profileImage);
+      console.log(data);
       if (data.data.rating != 0) {
         setRatingState("Rating");
       }
     } catch (error) {}
   };
-  if (local.GetLocalStorage("username") == null) {
+    if (local.GetLocalStorage("username") == null) {
     username = local.GetLocalSessionStorage("username") as string;
     token = local.GetLocalSessionStorage("auth-token") as string;
+     type=local.GetLocalSessionStorage("usertype") as string;
   } else {
     username = local.GetLocalStorage("username") as string;
     token = local.GetLocalStorage("auth-token") as string;
+    type=local.GetLocalStorage("usertype") as string;
   }
+ 
+  useEffect(()=>{
+     if(type!='barman') {
+      setViewType('none');
+      setHeight('28rem');
+      setMargin('20px');
+      console.log(usernameRoute);
+      username=usernameRoute; }
+      else if(type==='barman'&&usernameRoute!='Me'){
+        setViewType('none');
+        setHeight('28rem');
+        setMargin('20px');
+         username=usernameRoute;
+        }
+
+ },[]);
   useEffect(() => {
     handlegetdata(username, token);
+
   }, [change]);
   return (
     //UserView
@@ -121,10 +146,11 @@ const Profile = () => {
           />
           <Button
             variant="contained"
-            sx={{ height: "1 rem" }}
+            sx={{ height: "1 rem" , display:viewType}}
             component="label"
             onClick={() => {
               console.log(userdata?.data.profileImage);
+             
             }}
           >
             Upload
@@ -198,7 +224,7 @@ const Profile = () => {
               }}
             >
               <Typography component="legend">{ratingstate}</Typography>
-              <Rating readOnly value={userdata?.data.rating} />
+              <Rating   readOnly value={userdata?.data.rating} />
             </Box>
             <Box
               sx={{
@@ -264,15 +290,21 @@ const Profile = () => {
         </Box>
         <Box
           sx={{
-            width: "30%",
+            width: "35%",
             display: "flex",
             flexDirection: "row",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             alignItems: "flex-start",
             height: "30rem",
           }}
         >
-          <List sx={{ width: "100%" }}>
+          <Box sx={{
+             width: "100%",
+            flexDirection: "Column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <List sx={{display:viewType}}>
             <ListItemButton onClick={handleOpen}>
               <ListItemIcon>
                 <AddIcon />
@@ -297,6 +329,7 @@ const Profile = () => {
                       token,
                       drink
                     );
+                    setChange(++change);
                   }}
                 >
                   <Button type="submit" variant="contained" size="small">
@@ -307,12 +340,16 @@ const Profile = () => {
                     required
                     onChange={(e) => {
                       setDrink(e.target.value);
+                      console.log(drink);
                     }}
                   />
                 </Box>
               </List>
             </Collapse>
           </List>
+          <CocktailList boxMargin={boxMargin}  height={boxHeight} specilaDrinks={userdata?.data.specilaDrinks}></CocktailList>
+          </Box>
+          <Divider sx={{alignSelf:'flex-end'}} orientation="vertical"/>
         </Box>
       </Box>
     </Box>

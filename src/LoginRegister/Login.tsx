@@ -18,7 +18,8 @@ import useLocal from "../customhooks/useLocal";
 interface dataprovided{
     token:string,
     username:string,
-    type:string
+    type:string,
+    location:string;
 }
 const Login = () => {
   let navigate = useNavigate();
@@ -40,11 +41,13 @@ const Login = () => {
                 local.CreateStorage(res.token,'auth-token');
                 local.CreateStorage(res.username,'username');
                 local.CreateStorage(res.type,'usertype');
+                local.CreateStorage(res.location,'location')
                 }
                 else {
                 local.CreateSessionStorage(res.token,'auth-token');
                 local.CreateSessionStorage(res.username,'username');
-                local.CreateSessionStorage(res.type,'usertype'); }
+                local.CreateSessionStorage(res.type,'usertype'); 
+                local.CreateSessionStorage(res.location,'location') }
                 navigate('/Home');
             }
 
