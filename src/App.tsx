@@ -7,6 +7,7 @@ import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import Profile from './Page/MyProfile';
 import {useState} from "react"
 import Home from './Page/Home';
+import Invitation from './Page/Invitation';
 import './App.css'
 const App=()=> {
   return (
@@ -16,7 +17,8 @@ const App=()=> {
         <Route path='/'element={<Login/>}/>
         <Route path='/register'element={<RegisterComp/>}/>
         <Route path='/Home'element={<><Home/><Navbar/></>}/>
-        <Route  path='/Profile/:usernameRoute'element={<><Navbar/><Profile/></>}/>
+        <Route path='/Profile/:usernameRoute'element={<><Navbar/><Profile/></>}/>
+        <Route path='/MakeInvitation' element={<><Navbar/><Invitation/></>}/>
       </Routes>
        </div>
     </BrowserRouter>

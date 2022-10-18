@@ -1,10 +1,26 @@
 import { AppBar, Card, Typography ,Button,Avatar,Icon} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import Logo from '../Log.svg'
-import { Link } from "react-router-dom";
+import {useState,useEffect} from "react"
 import useLocal from "../customhooks/useLocal";
 const Navbar = () => {
   const navigate=useNavigate();
+  const local=useLocal();
+  const [viewprofile,setViewProfile]=useState(' ');
+  let type:string;
+    if (local.GetLocalStorage("username") == null) {
+     type=local.GetLocalSessionStorage("usertype") as string;
+  } else {
+    type=local.GetLocalStorage("usertype") as string;
+   
+  }
+  useEffect(()=>{
+
+     if(type=='user'){
+      setViewProfile('none');
+     }
+  })
+ 
   return (
     <AppBar
       sx={{
@@ -30,15 +46,13 @@ const Navbar = () => {
       }} > 
         <Typography sx={{fonstSize:'1rem',color:'black'}}>Home </Typography>
       </Button>
-      {/* <Button sx={{color:'white'}} onClick={()=>{
+      <Button sx={{color:'white',display:viewprofile}} onClick={()=>{
         navigate('/Profile/Me');
+        navigate(0);
       }}>
      
         <Typography  sx={{fonstSize:'1rem',color:'black'}}> Profile</Typography>
-      </Button> */}
-       <Link to='/Profile/Me'>PROFILE</Link>
-      
-      
+      </Button>
     </AppBar>
   );
 };
