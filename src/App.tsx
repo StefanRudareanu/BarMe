@@ -18,7 +18,7 @@ const App=()=> {
         <Route path='/register'element={<RegisterComp/>}/>
         <Route path='/Home'element={<><Home/><Navbar/></>}/>
         <Route path='/Profile/:usernameRoute'element={<><Navbar/><Profile/></>}/>
-        <Route path='/MakeInvitation' element={<><Navbar/><Invitation/></>}/>
+        <Route path='/MakeInvitation/:reciver' element={<><Navbar/><Invitation/></>}/>
       </Routes>
        </div>
     </BrowserRouter>

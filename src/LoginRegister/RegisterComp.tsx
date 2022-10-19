@@ -13,6 +13,7 @@ import {
   FormHelperText
 } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import HandleLogReg from "../endpoints/HandleLogReg";
 const RegisterComp = () => {
   const cities = [
@@ -26,6 +27,7 @@ const RegisterComp = () => {
     "Oradea",
     "Arad",
   ];
+  const navigate=useNavigate();
   const [city, setCity] = useState<string|null>(null);
   const [email, setEmail] = useState<string>(" ");
   const [password, setPasword] = useState<string>("");
@@ -91,8 +93,9 @@ const RegisterComp = () => {
              e.preventDefault();
              let data={username:username,password:password,email:email,location:city,phonenumber:phoneNumber,type:usertype};
              let resposne=await HandleLogReg().Register(data);
-             let message=await resposne.json();
-             console.log(message);
+             if(resposne.status!=400){
+               navigate('/');
+             }
             })}
         >
           <Box
@@ -139,7 +142,6 @@ const RegisterComp = () => {
                 value={city}
                 onChange={(e) => {
                  setCity(e.target.value);
-                 console.log(city);
                  
                 }}
                 sx={{ width: "13rem" }}

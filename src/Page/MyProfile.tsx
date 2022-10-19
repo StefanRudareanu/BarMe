@@ -11,7 +11,8 @@ import {
   ListItemText,
   Collapse,
   TextField,
-} from "@mui/material";
+} from "@mui/material"
+;
 import CocktailList from "../Components/CocktailsList";
 import useLocal from "../customhooks/useLocal";
 import UserData from "../endpoints/HandleUserData";
@@ -24,8 +25,8 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import {FunctionComponent as FC} from "react";
+import { useParams,Navigate,useNavigate} from "react-router-dom";
+import useTokenValidation from "../customhooks/useTokenValidation";
 interface userdata {
   data: {
     email: string;
@@ -38,15 +39,19 @@ interface userdata {
   };
 };
 const Profile = () => {
+  const TokenValidation=useTokenValidation();
   const {usernameRoute}=useParams();
+  const navigate=useNavigate();
   const [userdata, SetUserdata] = useState<userdata>();
   let [change, setChange] = useState(0);
   const [ratingstate, setRatingState] = useState("No rating given:");
   const [drink, setDrink] = useState("");
   const local = useLocal();
   const [viewType,setViewType]=useState(" ");
+  const [viewInvite,setViewInvite]=useState("none");
   const [boxHeight,setHeight]=useState("23rem");
   const [boxMargin,setMargin]=useState('0px');
+  const [tokenstatus,setTokenStatus]=useState<number>();
   let eventsnames = [
     { name: "Stefan", _id: "some" },
     { name: "Stefan", _id: "some" },
@@ -85,19 +90,30 @@ const Profile = () => {
     token = local.GetLocalStorage("auth-token") as string;
     type=local.GetLocalStorage("usertype") as string;
   }
- 
+  useEffect(()=>{
+        if(token!=null){
+      let status=TokenValidation.Validate(token);
+      setTokenStatus(status);
+     }
+     else{
+     setTokenStatus(400);
+     }
+
+  },[])
   useEffect(()=>{
      if(type!='barman') {
       setViewType('none');
       setHeight('28rem');
       setMargin('20px');
       console.log(usernameRoute);
-      username=usernameRoute; }
+      username=usernameRoute;
+      setViewInvite(' ');}
       else if(type==='barman'&&usernameRoute!='Me'){
         setViewType('none');
         setHeight('28rem');
         setMargin('20px');
-         username=usernameRoute;
+        username=usernameRoute;
+        setViewInvite(' ');
         }
 
  },[]);
@@ -105,6 +121,8 @@ const Profile = () => {
     handlegetdata(username, token);
 
   }, [change]);
+  if(tokenstatus!=null){
+  if(tokenstatus==200){
   return (
     //UserView
     <Box
@@ -177,6 +195,11 @@ const Profile = () => {
               }}
             />
           </Button>
+          <Button variant="contained" color="secondary" sx={{display:viewInvite}}
+          onClick={()=>{
+            navigate(`/MakeInvitation/${usernameRoute}`);
+          }}
+          >Send Invitation</Button>
           <Typography sx={{ fontSize: "1.2rem", color: "white" }}>
             {userdata?.data.username}
           </Typography>
@@ -353,6 +376,12 @@ const Profile = () => {
         </Box>
       </Box>
     </Box>
-  );
+  );}
+  else {
+    return(
+      <Navigate replace to="/"/>
+    )
+  }
+}
 };
 export default Profile;

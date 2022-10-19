@@ -9,10 +9,12 @@ import {
   MenuItem
 }
   from "@mui/material";
-import { useEffect, useState,useCallback } from "react";
+import { useEffect, useState} from "react";
 import useLocal from "../customhooks/useLocal";
 import BarmanList from "../Components/BarmanList";
 import UserData from "../endpoints/HandleUserData";
+import {Navigate} from "react-router-dom";
+import useTokenValidation from "../customhooks/useTokenValidation";
 interface Barman{
     data:{
         username:string,
@@ -32,6 +34,7 @@ const Home = () => {
     "Arad",
   ];
   const  local=useLocal();
+  const TokenValidation=useTokenValidation();
   const[tabValue,setTab]=useState(0);
   let [change,setChange]=useState(0);
   const [viewbarman, setViewBarman] = useState("flex");
@@ -39,6 +42,7 @@ const Home = () => {
   const [viewrecent, setViewRecent] = useState("none");
   const [data,setData]=useState<Barman>();
   const [inputValue,setInputValue]=useState("");
+  const [tokenstatus,setTokenStatus]=useState<number>();
   let username:string;
   let token:string;
   let type:string;
@@ -71,6 +75,16 @@ const Home = () => {
       setData(data);
     } catch (error) {
       console.log(error); }}
+
+  useEffect(()=>{
+      if(token!=null){
+      let status=TokenValidation.Validate(token);
+      setTokenStatus(status);
+     }
+     else{
+        setTokenStatus(400) }
+
+  },[]);
   useEffect(()=>{
   setInputValue(location);
    if(type!='barman'){
@@ -88,6 +102,8 @@ const Home = () => {
     else {
       GetDataBarman();}
   },[change])
+  if(tokenstatus!=null){
+  if(tokenstatus==200){
   return (
     <Container
       sx={{
@@ -182,7 +198,6 @@ const Home = () => {
                   console.log(e.target.value);
                   setInputValue(e.target.value);
                   setChange(++change);
-                
                 }}
               >
                 {
@@ -194,6 +209,12 @@ const Home = () => {
 
             </FormControl>
     </Container>
-  );
+  );}
+  else {
+    return(
+      <Navigate replace to='/'/>
+    )
+  }
+  }
 };
 export default Home;

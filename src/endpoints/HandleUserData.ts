@@ -41,7 +41,20 @@
                     "Content-type":"application/json",
                     "auth-token":token}
             })
-        }
+        },
+        CheckToken(token:string):number{
+        let status:number;
+         fetch('http://localhost:4000/api/users/avaible',{
+                method:"GET",
+                headers:{
+                    "Content-type":"application/json",
+                    "auth-token":token
+                }
+            }).then((res)=>{
+                status=res.status;
+            });
+            return status;}
+        
                 
     }
 }

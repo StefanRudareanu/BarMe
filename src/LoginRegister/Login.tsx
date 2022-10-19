@@ -11,10 +11,12 @@ import {
   Checkbox,
   FormControlLabel
 } from "@mui/material";
-import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useState } from "react";
 import HandleLogReg from "../endpoints/HandleLogReg";
 import useLocal from "../customhooks/useLocal";
+import useTokenValidation from "../customhooks/useTokenValidation";
+import {Navigate} from "react-router-dom";
 interface dataprovided{
     token:string,
     username:string,
@@ -27,6 +29,10 @@ const Login = () => {
   const [password, setPassword] = useState<string>("");
   const [status,setStatus]=useState<string>("none");
   const [checkstatus,setCheckstatus]=useState<string>(' ');
+  const tokenValidator=useTokenValidation();
+  const naviagte=useNavigate();
+  let token:string;
+  let tokenstatus:number;;
   const local=useLocal();
   const handleSubmit=async (data:object)=>{
           try {
@@ -56,6 +62,27 @@ const Login = () => {
           }
 
   }
+
+  if(local.GetLocalStorage('auth-token')==null){
+    token=local.GetLocalSessionStorage('auth-token');
+    if(token!=null){
+    tokenstatus=tokenValidator.Validate(token);}
+    else {
+      tokenstatus=400;
+    }
+    console.log(tokenstatus);
+  }
+  else {
+    token=local.GetLocalStorage('auth-token');
+    if(token!=null){
+      tokenstatus=tokenValidator.Validate(token);
+    console.log(tokenstatus);}
+    else {
+      tokenstatus=400;
+    }  
+    console.log(tokenstatus);
+  }
+  if(tokenstatus==400){
   return (
     <Container
       sx={{
@@ -150,6 +177,14 @@ const Login = () => {
       
     </Container>
   );
+        }
+        else {
+          return(
+              <Navigate replace to={'/Home'}/>
+          )
+        
+        }
+
 };
 
 export default Login;
