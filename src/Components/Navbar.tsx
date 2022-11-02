@@ -53,6 +53,13 @@ const Navbar = () => {
      
         <Typography  sx={{fonstSize:'1rem',color:'black'}}> Profile</Typography>
       </Button>
+      <Button sx={{color:'white',display:viewprofile}} onClick={()=>{
+        navigate('/Calendar');
+        navigate(0);
+      }}>
+     
+        <Typography  sx={{fonstSize:'1rem',color:'black'}}>Calendar</Typography>
+      </Button>
     </AppBar>
   );
 };

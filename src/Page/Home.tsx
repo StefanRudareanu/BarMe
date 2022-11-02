@@ -8,7 +8,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useLocal from "../customhooks/useLocal";
 import BarmanList from "../Components/BarmanList";
 import UserData from "../endpoints/HandleUserData";
@@ -23,13 +23,17 @@ interface Barman {
     email: string;
   }[];
 }
-interface listdata{
-   data:{
-    eventDate:string;
-    sender:string;
-    _id:string;
-  }[]
-
+interface listdata {
+  data: {
+    eventDate: string;
+    sender: string;
+    reciver: string;
+    inviteState:string; 
+    inviteRating:number;
+    eventPlace:string;
+    drinks:string[];
+    _id: string;
+  }[];
 }
 const Home = () => {
   const cities = [
@@ -49,11 +53,16 @@ const Home = () => {
   let [change, setChange] = useState(0);
   const [viewbarman, setViewBarman] = useState("flex");
   const [viewrequests, setViewRequests] = useState("none");
+  const [acceptedinviteData, setAccepted] = useState<listdata>();
   const [viewrecent, setViewRecent] = useState("none");
+  const [viewrecentInTab, setViewRecentInTab] = useState(" ");
   const [data, setData] = useState<Barman>();
-  const [invitedata,setInviteData]=useState<listdata>()
+  const [invitedata, setInviteData] = useState<listdata>();
+  const [recentsevent, setRcentEvents] = useState<listdata>();
   const [inputValue, setInputValue] = useState("");
   const [tokenstatus, setTokenStatus] = useState<number>();
+  const [invitechange, setInviteChange] = useState(0);
+  const [ratingevents, setRatingEvents] = useState<listdata>();
   let username: string;
   let token: string;
   let type: string;
@@ -69,7 +78,22 @@ const Home = () => {
     type = local.GetLocalStorage("usertype") as string;
     location = local.GetLocalStorage("location") as string;
   }
-  async function GetDataUser() {
+  async function GetRecentEvents() {
+    try {
+      const res = await HandleInvitation().GetRecentEvents(token, username);
+      const data = await res.json();
+      setRcentEvents(data);
+    } catch (error) {}
+  }
+  async function GetRatingEvents() {
+    try {
+      const res = await HandleInvitation().GetRatingEvents(token, username);
+      const data = await res.json();
+      setRatingEvents(data);
+    } catch (error) {}
+  }
+
+  async function GetDataUser(inputValue: string) {
     try {
       const res = await UserData().GetBarmanDataUser(inputValue, token);
       let data = await res.json();
@@ -78,7 +102,8 @@ const Home = () => {
       console.log(error);
     }
   }
-  async function GetDataBarman() {
+
+  async function GetDataBarman(inputValue: string) {
     try {
       const res = await UserData().GetBarmanDataBarman(
         username,
@@ -91,14 +116,26 @@ const Home = () => {
       console.log(error);
     }
   }
-  async function GetRequestsData(){
+
+  async function GetRequestsData() {
     try {
-      const res=await HandleInvitation().GetInvitationBarman(token,username);
-      const data=await res.json();
+      const res = await HandleInvitation().GetInvitationBarman(token, username);
+      const data = await res.json();
       setInviteData(data);
-      console.log(data);
     } catch (error) {
-      
+      console.log(error);
+    }
+  }
+  async function GetAcceptedData() {
+    try {
+      const res = await HandleInvitation().GetAcceptedEventsBarman(
+        token,
+        username
+      );
+      const data = await res.json();
+      setAccepted(data);
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -110,26 +147,50 @@ const Home = () => {
       setTokenStatus(400);
     }
   }, []);
+
   useEffect(() => {
-    setInputValue(location);
+    setInputValue(location)
     if (type != "barman") {
-      GetDataUser();
+      GetDataUser(location);
+      setViewRecentInTab("none");
+       GetRatingEvents();
     } else {
-      GetDataBarman();
+      GetDataBarman(location);
+      GetRequestsData();
+      GetAcceptedData();
+      GetRecentEvents();
     }
   }, []);
+
+  // useEffect(() => {
+  //   if (type == "barman") {
+     
+  //   } else {
+     
+  //   }
+  // }, []);
+
   useEffect(() => {
+    if (type == "barman") {
+      GetRequestsData();
+      GetAcceptedData();
+      
+    }
+    else {
+      GetRatingEvents();
+     
+    }
+  }, [invitechange]);
+
+  useEffect(() => {
+    if(change!=0){
     if (type != "barman") {
-      GetDataUser();
-      console.log(inputValue);
+      GetDataUser(inputValue);
     } else {
-      GetDataBarman();
+      GetDataBarman(inputValue);
+    }
     }
   }, [change]);
-useEffect(()=>{
-  GetRequestsData();
-},[])
-
 
   if (tokenstatus != null) {
     if (tokenstatus == 200) {
@@ -159,8 +220,8 @@ useEffect(()=>{
               borderColor: "divider",
               boxShadow: "10",
               width: "fit-content",
-              height: "20rem",
-              borderRadius: "10px",
+              height: "fit-content",
+
               position: "sticky",
 
               minHeight: "auto",
@@ -176,7 +237,7 @@ useEffect(()=>{
               }}
             />
             <Tab
-              sx={{ height: "6rem" }}
+              sx={{ height: "6rem", display: viewrecentInTab }}
               label="YouRequests"
               onClick={() => {
                 setViewBarman("none");
@@ -203,7 +264,31 @@ useEffect(()=>{
               height: "45rem",
               borderRadius: "20px",
             }}
-          ></Box>
+          >
+            {recentsevent && (
+              <Requests
+                ratingdisplay=" "
+                elmchange={false}
+                subheadername="Recents events"
+                viewtype="none"
+                data={recentsevent.data}
+                height={'45rem'}
+              />
+            )}
+            {ratingevents && (
+              <Requests
+                change={invitechange}
+                setChange={setInviteChange}
+                subheadername="Your last events"
+                viewtype="none"
+                ratingdisplay=" "
+                elmchange={true}
+                data={ratingevents.data}
+                token={token}
+                height={'45rem'}
+              />
+            )}
+          </Box>
           <Box
             sx={{
               display: viewrequests,
@@ -216,8 +301,29 @@ useEffect(()=>{
               alignItems: "center",
             }}
           >
-            {invitedata&&  <Requests  subheadername="Incoming requests" viewtype=' ' data={invitedata.data}></Requests>}
-            {invitedata && <Requests subheadername="Upcoming Events"  viewtype='none' data={invitedata.data}/>}
+            {invitedata && (
+              <Requests
+                token={token}
+                setChange={setInviteChange}
+                elmchange={false}
+                change={invitechange}
+                subheadername="Incoming requests"
+                ratingdisplay="none"
+                viewtype=" "
+                data={invitedata.data}
+                height={'22.5rem'}
+              ></Requests>
+            )}
+            {acceptedinviteData && (
+              <Requests
+                subheadername="Upcoming Events"
+                elmchange={false}
+                ratingdisplay="none"
+                viewtype="none"
+                height={'22.5rem'}
+                data={acceptedinviteData.data}
+              />
+            )}
           </Box>
           <FormControl sx={{ m: 1, minWidth: 80 }}>
             <InputLabel id="demo-simple-select-autowidth-label">
@@ -232,7 +338,7 @@ useEffect(()=>{
               label="City"
               onChange={(e) => {
                 console.log(e.target.value);
-                setInputValue(e.target.value);
+                setInputValue(e.target.value);                
                 setChange(++change);
               }}
             >

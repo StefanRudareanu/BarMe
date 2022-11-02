@@ -70,7 +70,7 @@ const Invitation = () => {
   const handleSubmit = async (data: invitationdata) => {
     console.log(data);
     try {
-      const res = await HandleInvitation().CreateInvitation(token, data);
+      const res = await HandleInvitation().CreateInvitation(token, data,sender);
       if (res.status == 400) {
         setWarning(true);
       } else {

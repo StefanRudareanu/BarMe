@@ -28,7 +28,7 @@ const BarmanList:FC<barmans>=(props)=>{
      <Box
         sx={{
           display:viewbarman,
-          width: "45%",
+          width: "40rem",
           borderRadius: "20px",
           alignItems: "flex-start",
           flexWrap:'wrap',
@@ -49,8 +49,9 @@ const BarmanList:FC<barmans>=(props)=>{
             justifyContent: "flex-start",
             alignItems: "center",
             boxShadow: "5",
-            width: "30rem",
+            width: "40rem",
             borderRadius: "15px",
+         
           }}
         >
           <CardMedia
@@ -78,6 +79,7 @@ const BarmanList:FC<barmans>=(props)=>{
             >
               <Box
                 sx={{
+              
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
@@ -85,7 +87,7 @@ const BarmanList:FC<barmans>=(props)=>{
                 }}
               >
                 <EmailIcon />
-                <Typography>{element.email}</Typography>
+                  <Typography sx={{fontSize:'1rem'}}>{element.email}</Typography>
               </Box>
               <Box
                 sx={{

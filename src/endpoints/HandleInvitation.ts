@@ -9,8 +9,8 @@ interface invitationdata {
 }
 const HandleInvitation = () => {
   return {
-    async CreateInvitation(token: string, data: invitationdata) {
-      return await fetch("http://localhost:4000/api/event", {
+    async CreateInvitation(token: string, data: invitationdata,username:string) {
+      return await fetch(`http://localhost:4000/api/event/${username}`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -52,6 +52,53 @@ const HandleInvitation = () => {
         },
       });
     },
+    async GetAcceptedEventsBarman(token: string, username: string) {
+      return await fetch(
+        `http://localhost:4000/api/event/accepted/${username}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            "auth-token": token,
+          },
+        }
+      );
+    },
+    async AcceptInvitaion(token:string,id:string,state:string){
+        return await fetch(`http://localhost:4000/api/event/${id}/${state}`,{
+            method:'PUT',
+            headers:{
+                "Content-type":"application/json",
+                "auth-token":token
+            }
+        })
+    },
+    async GetRecentEvents(token:string,username:string){
+        return await fetch(`http://localhost:4000/api/event/recentevents/${username}`,{
+            method:'GET',
+            headers:{
+                'Content-type':'application/json',
+                "auth-token":token
+            }
+        })
+    },
+      async GetRatingEvents(token:string,username:string){
+        return await fetch(`http://localhost:4000/api/event/rating/${username}`,{
+            method:'GET',
+            headers:{
+                'Content-type':'application/json',
+                "auth-token":token
+            }
+        })
+    },
+    async UpdateRatedInvite(token:string,id:string,value:number){
+        return await fetch(`http://localhost:4000/api/event/updaterating/${id}`,{
+            method:'PATCH',
+            headers:{
+                'Content-type':'application/json',
+                'auth-token':token  } ,
+                body:JSON.stringify({value:value})})
+    }
   };
 };
 export default HandleInvitation;

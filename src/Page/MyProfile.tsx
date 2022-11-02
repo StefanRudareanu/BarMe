@@ -26,7 +26,9 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
 import { useParams,Navigate,useNavigate} from "react-router-dom";
+import HandleInvitation from "../endpoints/HandleInvitation";
 import useTokenValidation from "../customhooks/useTokenValidation";
+import Requests from "../Components/Requests"
 interface userdata {
   data: {
     email: string;
@@ -36,9 +38,23 @@ interface userdata {
     rating: number;
     username: string;
     specilaDrinks:string[];
+
   };
 };
+interface listdata{
+   data:{
+    eventDate:string;
+    eventPlace:string;
+    drinks:string[];
+    sender:string;
+    reciver:string;
+    inviteState:string;
+    inviteRating:number;
+    _id:string;
+  }[]
+}
 const Profile = () => {
+
   const TokenValidation=useTokenValidation();
   const {usernameRoute}=useParams();
   const navigate=useNavigate();
@@ -52,32 +68,35 @@ const Profile = () => {
   const [boxHeight,setHeight]=useState("23rem");
   const [boxMargin,setMargin]=useState('0px');
   const [tokenstatus,setTokenStatus]=useState<number>();
-  let eventsnames = [
-    { name: "Stefan", _id: "some" },
-    { name: "Stefan", _id: "some" },
-    { name: "Stefan", _id: "some" },
-    { name: "Stefan", _id: "some" },
-    { name: "Stefan", _id: "some" },
-    { name: "Stefan", _id: "some" },
-    { name: "Stefan", _id: "some" },
-    { name: "Stefan", _id: "some" },
-    { name: "Stefan", _id: "some" },
-  ];
   const [open, setOpen] = useState(true);
+  const [listdata,setListData]=useState<listdata>();
   const handleOpen = () => {
     setOpen(!open);
   };
   let username: string;
   let token: string;
   let type:string;
+  async function GetRecentEvents() {
+    try {
+      const res = await HandleInvitation().GetRecentEvents(token, username);
+      const data = await res.json();
+   
+      setListData(data);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   const handlegetdata = async (username: string, token: string) => {
     try {
       const res = await UserData().GetUserData(username, token);
       const data = await res.json();
+       
       SetUserdata(data);
-      console.log(data);
+      console.log(data.data.rating);
       if (data.data.rating != 0) {
         setRatingState("Rating");
+
       }
     } catch (error) {}
   };
@@ -107,11 +126,13 @@ const Profile = () => {
       setMargin('20px');
       console.log(usernameRoute);
       username=usernameRoute;
+  
       setViewInvite(' ');}
       else if(type==='barman'&&usernameRoute!='Me'){
         setViewType('none');
         setHeight('28rem');
         setMargin('20px');
+        // GetRecentEvents();
         username=usernameRoute;
         setViewInvite(' ');
         }
@@ -119,6 +140,8 @@ const Profile = () => {
  },[]);
   useEffect(() => {
     handlegetdata(username, token);
+
+     GetRecentEvents();
 
   }, [change]);
   if(tokenstatus!=null){
@@ -247,7 +270,7 @@ const Profile = () => {
               }}
             >
               <Typography component="legend">{ratingstate}</Typography>
-              <Rating   readOnly value={userdata?.data.rating} />
+              {userdata&&<Rating name='read-only' readOnly value={userdata?.data.rating} />}
             </Box>
             <Box
               sx={{
@@ -284,9 +307,9 @@ const Profile = () => {
               }}
             >
               <EmailIcon>:</EmailIcon>
-              <Typography sx={{ fontSize: "0.9rem", color: "black" }}>
+              <Typography sx={{ fontSize: "0.75rem", color: "black" }}>
                 {userdata?.data.email}
-              </Typography>
+                    </Typography>
             </Box>
           </Box>
           <Divider
@@ -297,15 +320,24 @@ const Profile = () => {
         <Box
           //List
           sx={{
-            width: "20%",
+            width: "50%",
             display: "flex",
             flexDirection: "row",
             justifyContent: "center",
-            alignItems: "center",
+            alignItems: "space-evenly",
             height: "30rem",
           }}
         >
-          <ProfileList eventsnames={eventsnames}></ProfileList>
+          {listdata && (
+              <Requests
+                ratingdisplay=" "
+                elmchange={false}
+                subheadername="Recents events"
+                viewtype="none"
+                data={listdata.data}
+                height={'30rem'}
+              />
+            )}
           <Divider
             orientation="vertical"
             sx={{ alignSelf: "flex-end" }}

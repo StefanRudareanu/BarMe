@@ -21,11 +21,13 @@
             })
         },
         async AddRating(username:string,rating:number,token:string){
-            return await fetch(' ',{
+            return await fetch(`http://localhost:4000/api/users/barmanrating/${username}`,{
                 method:'PATCH',
                 headers:{
                     "Content-type":"application/json",
-                    'auth-token':token}});},
+                    'auth-token':token},
+                body:JSON.stringify({rating:rating})
+                });},
         async GetBarmanDataBarman(barmanusername:string,location:string,token:string){
             return await fetch(`http://localhost:4000/api/users/allbarmans/${barmanusername}/${location}`,{
                 method:"GET",
@@ -35,7 +37,7 @@
             })
         },
         async GetBarmanDataUser(location:string,token:string){
-            return await fetch(`http://localhost:4000/api/users/allbarmansusers/${location}/`,{
+            return await fetch(`http://localhost:4000/api/users/allbarmansusers/${location}`,{
                 method:"GET",
                 headers:{
                     "Content-type":"application/json",
@@ -53,9 +55,9 @@
             }).then((res)=>{
                 status=res.status;
             });
-            return status;}
+            return status;},
         
-                
-    }
+        }
+        
 }
 export default UserData;
