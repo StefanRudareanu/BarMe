@@ -78,9 +78,8 @@ const Profile = () => {
   let type:string;
   async function GetRecentEvents() {
     try {
-      const res = await HandleInvitation().GetRecentEvents(token, username);
+      const res = await HandleInvitation().GetRatedEventsBarman(token, username);
       const data = await res.json();
-   
       setListData(data);
       console.log(data);
     } catch (error) {

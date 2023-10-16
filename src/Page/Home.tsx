@@ -7,6 +7,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  useStepContext,
 } from "@mui/material";
 import { useEffect, useState, useCallback } from "react";
 import useLocal from "../customhooks/useLocal";
@@ -63,6 +64,7 @@ const Home = () => {
   const [tokenstatus, setTokenStatus] = useState<number>();
   const [invitechange, setInviteChange] = useState(0);
   const [ratingevents, setRatingEvents] = useState<listdata>();
+  const [upcoming,setUpcoming]=useState<boolean>(false);
   let username: string;
   let token: string;
   let type: string;
@@ -77,6 +79,25 @@ const Home = () => {
     token = local.GetLocalStorage("auth-token") as string;
     type = local.GetLocalStorage("usertype") as string;
     location = local.GetLocalStorage("location") as string;
+  }
+  async function GetRatedEventsBarman(){
+    try {
+      const res=await HandleInvitation().GetRatedEventsBarman(token,username);
+      const data=await res.json();
+      setRcentEvents(data);
+    } catch (error) {
+
+    }
+  }
+  async function GetRequestedUser() {
+    try {
+    const res=await HandleInvitation().GetRequestedUser(token,username);
+    const data=await res.json();
+    setAccepted(data);
+    } catch (error) {
+      
+    }
+    
   }
   async function GetRecentEvents() {
     try {
@@ -133,6 +154,7 @@ const Home = () => {
         username
       );
       const data = await res.json();
+      console.log(data);
       setAccepted(data);
     } catch (error) {
       console.log(error);
@@ -151,14 +173,17 @@ const Home = () => {
   useEffect(() => {
     setInputValue(location)
     if (type != "barman") {
+      setUpcoming(true);
       GetDataUser(location);
-      setViewRecentInTab("none");
-       GetRatingEvents();
+      GetRatingEvents();
+      GetRequestedUser();
     } else {
+      
       GetDataBarman(location);
       GetRequestsData();
       GetAcceptedData();
-      GetRecentEvents();
+      GetRatedEventsBarman();
+    
     }
   }, []);
 
@@ -317,7 +342,7 @@ const Home = () => {
             {acceptedinviteData && (
               <Requests
                 subheadername="Upcoming Events"
-                elmchange={false}
+                elmchange={upcoming}
                 ratingdisplay="none"
                 viewtype="none"
                 height={'22.5rem'}

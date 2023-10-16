@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HandleLogReg from "../endpoints/HandleLogReg";
+
 const RegisterComp = () => {
   const cities = [
     "Timisoara",

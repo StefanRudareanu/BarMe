@@ -81,6 +81,7 @@ const HandleInvitation = () => {
                 "auth-token":token
             }
         })
+
     },
       async GetRatingEvents(token:string,username:string){
         return await fetch(`http://localhost:4000/api/event/rating/${username}`,{
@@ -98,6 +99,25 @@ const HandleInvitation = () => {
                 'Content-type':'application/json',
                 'auth-token':token  } ,
                 body:JSON.stringify({value:value})})
+    },
+    async GetRatedEventsBarman(token:string, username:string){
+      return await fetch(`http://localhost:4000/api/event/ratedeventsbarman/${username}`,{
+        method:"GET",
+        headers:{
+          "Content-type":"application/json",
+          'auth-token':token
+        }
+      })
+
+    },
+    async GetRequestedUser(token:string,username:string){
+      return await fetch(`http://localhost:4000/api/event/requestedbarman/${username}`,{
+        method:"GET",
+        headers:{
+          "Content-type":'application/json',
+          'auth-token':token
+        }
+      })
     }
   };
 };

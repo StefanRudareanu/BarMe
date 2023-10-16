@@ -6,10 +6,6 @@ interface props{
         _id:string
     }[];
 }
-
-
-
-
 const ProfileList:FC<props>=(props)=>{
     const eventsnames=props.eventsnames;
     return(
@@ -45,7 +41,6 @@ const ProfileList:FC<props>=(props)=>{
             </ListItem>
             <Divider/>
             </Box>))}
-
             </List>
     )
 
